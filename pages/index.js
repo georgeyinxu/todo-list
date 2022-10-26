@@ -1,8 +1,35 @@
 import { useState } from 'react';
-import ReactDOM from 'react';
 
 export default function Home({ listItems }) {
   const [inputItem, setInputItem] = useState('Type Here');
+
+  const handleAddition = async () => {
+    const response = await fetch('http://localhost:3000/api/addToDo', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ inputItem })
+    });
+
+    if (response.status != 200) {
+      throw new Error("Failed to add new item")
+    }
+  }
+
+  const handleCompletedTask = async (index) => {
+    const response = await fetch('http://localhost:3000/api/deleteToDo', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ index })
+    })
+
+    if (response.status == 200) {
+      
+    }
+  }
 
   return (
     <div className='flex items-center justify-center h-screen'>
@@ -17,7 +44,7 @@ export default function Home({ listItems }) {
             className='input w-full max-w-xs'
             onChange={(e) => setInputItem(e.target.value)}
           />
-          <button class='btn btn-primary'>Add Item</button>
+          <button className='btn btn-primary' onClick={handleAddition}>Add Item</button>
         </form>
         <div className='grid grid-cols-4 gap-4 px-4 mt-10'>
           {listItems.map((listItem, i) => {
@@ -27,7 +54,7 @@ export default function Home({ listItems }) {
                 <h2 className='card-title'>List Item #{i + 1}</h2>
                 <p className='text-left'>{listItem.item}</p>
                 <div className='card-actions justify-end'>
-                  <button className='btn btn-primary'>Completed</button>
+                  <button className='btn btn-primary' onClick={() => handleCompletedTask(listItem.id)}>Completed</button>
                 </div>
               </div>
             </div>
@@ -36,18 +63,6 @@ export default function Home({ listItems }) {
         </div>
       </div>
     </div>
-    // <div>
-    //   <h1 className='text-3xl font-bold underline'>HOLY</h1>
-    //   {/* {JSON.stringify(listItems)}
-    //   { error }
-    //   {listItems.map((listItem, i) => {
-    //     return (
-    //       <div key={i}>
-    //         <h2>{listItem.item}</h2>
-    //       </div>
-    //     );
-    //   })} */}
-    // </div>
   );
 }
 
