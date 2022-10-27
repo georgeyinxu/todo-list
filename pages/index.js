@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import ItemInput from '../components/input';
+import CardItems from '../components/list-items';
 
-export default function Home({ listItems }) {
+export default function Home() {
   const [inputItem, setInputItem] = useState('Type Here');
+  const [items, setItems] = useState([]);
+  const [refresh, setRefresh] = useState(false);
 
   const handleAddition = async () => {
     const response = await fetch('http://localhost:3000/api/addToDo', {
@@ -12,9 +16,7 @@ export default function Home({ listItems }) {
       body: JSON.stringify({ inputItem })
     });
 
-    if (response.status != 200) {
-      throw new Error("Failed to add new item")
-    }
+    setRefresh(true);
   }
 
   const handleCompletedTask = async (index) => {
@@ -26,10 +28,22 @@ export default function Home({ listItems }) {
       body: JSON.stringify({ index })
     })
 
-    if (response.status == 200) {
-      
-    }
+    setRefresh(true);
   }
+
+  const handleFetch = async () => {
+    const response = await fetch('http://localhost:3000/api/todo');
+    const data = await response.json();
+
+    return data
+  }
+
+  useEffect(() => {
+    handleFetch().then(data => {
+      setItems(data);
+      setRefresh(false);
+    });
+  }, [refresh])
 
   return (
     <div className='flex items-center justify-center h-screen'>
@@ -37,41 +51,9 @@ export default function Home({ listItems }) {
         <h1 className='text-3xl font-black mb-10'>
           Welcome to George's Todo list
         </h1>
-        <form>
-          <input
-            type='text'
-            placeholder={inputItem}
-            className='input w-full max-w-xs'
-            onChange={(e) => setInputItem(e.target.value)}
-          />
-          <button className='btn btn-primary' onClick={handleAddition}>Add Item</button>
-        </form>
-        <div className='grid grid-cols-4 gap-4 px-4 mt-10'>
-          {listItems.map((listItem, i) => {
-            return (
-            <div className='card w-70 bg-base-100 shadow-xl' key={i}>
-              <div className='card-body'>
-                <h2 className='card-title'>List Item #{i + 1}</h2>
-                <p className='text-left'>{listItem.item}</p>
-                <div className='card-actions justify-end'>
-                  <button className='btn btn-primary' onClick={() => handleCompletedTask(listItem.id)}>Completed</button>
-                </div>
-              </div>
-            </div>
-            )
-          })}
-        </div>
+        <ItemInput inputItem={inputItem} handleAddition={handleAddition} setInputItem={setInputItem} />
+        <CardItems items={items} handleCompletedTask={handleCompletedTask} />
       </div>
     </div>
   );
-}
-
-export async function getServerSideProps() {
-  const response = await fetch('http://localhost:3000/api/todo');
-  const data = await response.json();
-  return {
-    props: {
-      listItems: data,
-    },
-  };
 }
