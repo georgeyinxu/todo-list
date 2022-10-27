@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import ItemInput from '../components/input';
 import CardItems from '../components/list-items';
+import { DateTime } from 'luxon';
 
 export default function Home({ data }) {
   const [inputItem, setInputItem] = useState('Type Here');
@@ -16,7 +17,7 @@ export default function Home({ data }) {
       body: JSON.stringify({ inputItem })
     });
 
-    setItems([...items, {item: inputItem}])
+    setItems([...items, {item: inputItem, created_at: DateTime.now() }])
   }
 
   const handleCompletedTask = async (index) => {
