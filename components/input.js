@@ -1,13 +1,13 @@
 const ItemInput = ({ inputItem, handleAddition, setInputItem }) => {
   return (
-  <form>
+  <form onSubmit={handleAddition}>
     <input
       type='text'
       placeholder={inputItem}
       className='input w-full max-w-xs'
       onChange={(e) => setInputItem(e.target.value)}
     />
-    <button className='btn btn-primary' onClick={handleAddition}>Add Item</button>
+    <button type="submit" className='btn btn-primary'>Add Item</button>
   </form>
   )
 }
